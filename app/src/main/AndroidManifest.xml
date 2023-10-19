@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <uses-feature android:name="android.hardware.location.gps" />
+
+    <application
+        android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:enableOnBackInvokedCallback="true"
+        android:fullBackupContent="@xml/backup_rules"
+        android:icon="@drawable/logo"
+        android:label="Bird AviScope"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.OPSC_BirdApp"
+        tools:targetApi="31">
+        <activity
+            android:name=".ViewAllBirds"
+            android:exported="false" />
+        <activity
+            android:name=".ForgotPassword"
+            android:exported="false" />
+
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="@string/google_map_api_key" />
+
+        <activity
+            android:name=".Settings"
+            android:exported="false"
+            android:label="Settings" />
+        <activity
+            android:name=".UserLocation"
+            android:exported="false"
+            android:label="Where am I?" />
+        <activity
+            android:name=".SaveBird"
+            android:exported="false"
+            android:label="Save Bird Location" />
+        <activity
+            android:name=".Register"
+            android:exported="false"
+            android:label="Create an account" />
+        <activity
+            android:name=".LogIn"
+            android:exported="false"
+            android:label="Log In" />
+        <activity
+            android:name=".MainActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+    </application>
+
+</manifest>

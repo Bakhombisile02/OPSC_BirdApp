@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "293655165511",
+    "firebase_url": "https://opscbirdapp-default-rtdb.firebaseio.com",
+    "project_id": "opscbirdapp",
+    "storage_bucket": "opscbirdapp.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:293655165511:android:dcaf27c49c6bf69fe3cf62",
+        "android_client_info": {
+          "package_name": "com.example.opsc_birdapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "293655165511-un50j2163932aa5plfip5c9l48p4p83n.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.opsc_birdapp",
+            "certificate_hash": "4beb96a0d3e385164c4838937de43631b57a9b75"
+          }
+        },
+        {
+          "client_id": "293655165511-hvjmm50hcjd4fksgp3big7duk0cm4l24.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCX-S10xD5KMOpOkIS_6L7VArsnWsO5V88"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "293655165511-5v3r49jsi52hi5insrb0g9a8i7bebjm6.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

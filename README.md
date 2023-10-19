@@ -14,6 +14,7 @@ AviScope is an Android app that helps bird enthusiasts discover nearby bird watc
 - [Changelog](#changelog)
 - [Support](#support)
 - [Roadmap](#roadmap)
+- [Creators](#creators)
 
 ## Prerequisites
 
@@ -91,6 +92,20 @@ For any questions or concerns, please contact [siyamukeladlamini1@icloud.com].
 
 - Add feature to photograph birds during observation.
 - Release on Google Play Store.
+
+## Creators
+
+- Bakhombisile Dlamini
+  - Student Number: st10082221
+  - Institution: IIE Varsity College Cape Town
+
+- Alphar Gwenzi
+  - Student Number: st10081886
+  - Institution: IIE Varsity College Cape Town
+
+- Dominic Koopman
+  - Student Number: st10081776
+  - Institution: IIE Varsity College Cape Town
 
 
 

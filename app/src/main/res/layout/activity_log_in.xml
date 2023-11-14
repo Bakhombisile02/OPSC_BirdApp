@@ -69,7 +69,8 @@
             android:id="@+id/boxPassword"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="300dp"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            app:passwordToggleEnabled="true">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/txtPassword"
@@ -89,6 +90,44 @@
             app:cornerRadius="10dp"
             android:text="Continue"
             android:backgroundTint="@color/apptheme" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginVertical="20dp"
+            android:orientation="horizontal"
+            android:layout_gravity="center">
+            <View
+                android:layout_width="100dp"
+                android:layout_height="1dp"
+                android:layout_marginHorizontal="20dp"
+                android:layout_marginVertical="5dp"
+                android:background="@android:color/black" />
+
+            <TextView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_gravity="center"
+
+                android:text="OR" />
+
+            <View
+                android:layout_width="100dp"
+                android:layout_height="1dp"
+                android:layout_marginHorizontal="20dp"
+                android:background="@android:color/black" />
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/txtForgotPassword"
+            android:layout_width="130dp"
+            android:layout_height="20dp"
+            android:layout_gravity="right"
+            android:text="Forgot Password"
+            android:clickable="true"
+            android:textColor="@android:color/holo_blue_dark" />
+
 
     </LinearLayout>
 

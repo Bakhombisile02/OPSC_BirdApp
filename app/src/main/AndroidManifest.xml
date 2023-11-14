@@ -19,6 +19,9 @@
         android:theme="@style/Theme.OPSC_BirdApp"
         tools:targetApi="31">
         <activity
+            android:name=".TrophyDisplay"
+            android:exported="false" />
+        <activity
             android:name=".ViewAllBirds"
             android:exported="false" />
         <activity

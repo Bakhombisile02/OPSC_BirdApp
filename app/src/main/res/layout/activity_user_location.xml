@@ -1,14 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.drawerlayout.widget.DrawerLayout
+<androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:id="@+id/drawer_layout"
     tools:context=".UserLocation"
     android:orientation="vertical">
 
+    <androidx.drawerlayout.widget.DrawerLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/drawer_layout">
     <com.google.android.material.navigation.NavigationView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -17,27 +20,74 @@
         app:menu="@menu/nav_log_menu"
         android:fitsSystemWindows="true"/>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:id="@+id/coordinator"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="match_parent">
 
-        <androidx.fragment.app.FragmentContainerView
-            android:id="@+id/mapFragment"
-            android:layout_width="match_parent"
-            android:layout_height="725dp"
-            class="com.google.android.gms.maps.SupportMapFragment"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toTopOf="@id/distanceLabel"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
-        <TextView
-            android:id="@+id/distanceLabel"
-            android:layout_width="match_parent"
-            android:layout_height="60dp"
-            android:enabled="false"
-            android:gravity="center"
-            android:background="@drawable/round_back_white10_20"
-            android:textColor="@color/black"
-            app:layout_constraintTop_toBottomOf="@id/mapFragment" />
-    </androidx.constraintlayout.widget.ConstraintLayout>
-</androidx.drawerlayout.widget.DrawerLayout>
+
+            <androidx.fragment.app.FragmentContainerView
+                android:id="@+id/mapFragment"
+                android:layout_width="match_parent"
+                android:layout_height="700dp"
+                class="com.google.android.gms.maps.SupportMapFragment"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" />
+
+            <FrameLayout
+                android:id="@+id/sheet"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/apptheme"
+                app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"
+                app:layout_constraintTop_toBottomOf="@id/mapFragment"
+                app:behavior_peekHeight="0dp">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/round_back_white10_20"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/seasonLabel"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/white"
+                        android:text=""
+                        android:paddingLeft="35dp"
+                        android:textSize="16sp">
+                    </TextView>
+                    <TextView
+                        android:id="@+id/distanceLabel"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/white"
+                        android:text=""
+                        android:paddingLeft="35dp"
+                        android:textSize="16sp">
+                    </TextView>
+
+                    <RelativeLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingLeft="35dp">
+
+                        <Button
+                            android:id="@+id/btnDirec"
+                            android:layout_width="205dp"
+                            android:layout_height="45dp"
+                            android:text="Directions"
+                            android:textColor="@color/white"
+                            android:textSize="20sp"></Button>
+
+                    </RelativeLayout>
+
+
+                </LinearLayout>
+
+            </FrameLayout>
+
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+    </androidx.drawerlayout.widget.DrawerLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

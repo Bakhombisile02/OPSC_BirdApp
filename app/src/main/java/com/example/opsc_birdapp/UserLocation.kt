@@ -11,10 +11,13 @@ import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import android.view.MenuItem
+import android.widget.Button
+import android.widget.FrameLayout
 import android.widget.Toast
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.drawerlayout.widget.DrawerLayout
@@ -28,10 +31,8 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.CircleOptions
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.MarkerOptions
-import com.google.android.gms.maps.model.PolylineOptions
+import com.google.android.gms.maps.model.*
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
@@ -52,6 +53,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.*
+import java.util.*
+import kotlin.collections.ArrayList
 
 
 class UserLocation : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener,
@@ -463,6 +466,9 @@ class UserLocation : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
 
     //------------------------------------------------------------------------------------------------------------------------------//
+    // Define a mutable map to store markers and their associated click listeners
+    val markerClickListeners = mutableMapOf<Marker, () -> Boolean>()
+
     override fun onMapReady(googleMap: GoogleMap) {
         try {
             mGoogleMap = googleMap
@@ -486,34 +492,62 @@ class UserLocation : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 isMapToolbarEnabled = true
                 isIndoorLevelPickerEnabled = true
                 isScrollGesturesEnabledDuringRotateOrZoom = true
-
             }
 
+            // Add a marker click listener to the map
+            mGoogleMap?.setOnMarkerClickListener { marker ->
+                val listener = markerClickListeners[marker]
+                val consumed = listener?.invoke() ?: false
 
-            // Set up a map long press listener
-            mGoogleMap?.setOnMapLongClickListener { point ->
-                // When the map is long pressed, get the coordinates and show a marker
+                val coordinatorLayout = findViewById<CoordinatorLayout>(R.id.coordinator) // Replace with the correct ID of your CoordinatorLayout
+                val sheet1 = coordinatorLayout.findViewById<FrameLayout>(R.id.sheet)
+                val Route = sheet1.findViewById<Button>(R.id.btnDirec)
 
-                mGoogleMap?.addMarker(MarkerOptions().position(point))
 
-                // Get the current location
-                fusedLocationClient.lastLocation.addOnSuccessListener { location ->
-                    if (location != null) {
-                        val currentLocation = LatLng(location.latitude, location.longitude)
+                BottomSheetBehavior.from(sheet1).apply {
+                    peekHeight = 70
+                    state = BottomSheetBehavior.STATE_EXPANDED
 
-                        // Get directions from current location to the selected point
-                        getDirections(currentLocation, point)
+                    Route.setOnClickListener {
+                        fusedLocationClient.lastLocation.addOnSuccessListener { location ->
+                            if (location != null) {
+                                val currentLocation = LatLng(location.latitude, location.longitude)
+
+                                // Get directions from current location to the selected point
+                                getDirections(currentLocation, marker.position)
+                            }
+                        }
                     }
                 }
+                // Return true if you have consumed the event or if the custom listener returned true
+                consumed
             }
-
 
         } catch (e: Exception) {
             e.printStackTrace()
         }
     }
 
+    // To add a custom marker click listener for a marker, use the following function
+    fun addMarkerClickListener(marker: Marker, listener: () -> Boolean) {
+        markerClickListeners[marker] = listener
+    }
 
+
+
+    //------------------------------------------------------------------------------------------------------------------------------//
+    private fun getCurrentSeason(): String {
+        val calendar = Calendar.getInstance()
+        val month = calendar.get(Calendar.MONTH)
+
+        return when (month) {
+            Calendar.DECEMBER, Calendar.JANUARY, Calendar.FEBRUARY -> "Winter"
+            Calendar.MARCH, Calendar.APRIL, Calendar.MAY -> "Spring"
+            Calendar.JUNE, Calendar.JULY, Calendar.AUGUST -> "Summer"
+            Calendar.SEPTEMBER, Calendar.OCTOBER, Calendar.NOVEMBER -> "Fall"
+            else -> "Unknown"
+        }
+    }
     //------------------------------------------------------------------------------------------------------------------------------//
     private fun getDirections(origin: LatLng, destination: LatLng) {
 
@@ -552,14 +586,17 @@ class UserLocation : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     totalDistance += distance
                 }
 
-                val totalDistanceKilometers = totalDistance / 1000.0 // Convert meters to kilometers
-                val totalDistanceMiles =
-                    totalDistanceKilometers * 0.621371 // Convert kilometers to miles
+                val totalDistanceKilometers = totalDistance / 1000.0
+                val totalDistanceMiles = totalDistanceKilometers * 0.621371
+
+                // Call the function to get the current season
+                val currentSeason = getCurrentSeason()
+
+                binding.seasonLabel.text = "Current Season: $currentSeason"
 
                 if (pref == "true") {
                     // Display distance in kilometers
-                    binding.distanceLabel.text =
-                        "Total distance: $totalDistanceKilometers Kilometers"
+                    binding.distanceLabel.text = "Total distance: $totalDistanceKilometers Kilometers"
                 } else {
                     // Display distance in miles
                     binding.distanceLabel.text = "Total distance: $totalDistanceMiles Miles"
@@ -608,13 +645,13 @@ class UserLocation : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.nav_login -> openIntent(applicationContext, "", LogIn::class.java, radius, pref, languagePref)
-            R.id.nav_register -> openIntent(applicationContext, "", Register::class.java, radius, pref, languagePref)
+
             R.id.nav_save_bird -> openIntent(applicationContext, "", SaveBird::class.java, radius, pref, languagePref)
             R.id.nav_currentlocation -> openIntent(applicationContext, "", UserLocation::class.java, radius,pref, languagePref)
             R.id.nav_settings -> openIntent(applicationContext, "", Settings::class.java, radius, pref, languagePref)
             R.id.nav_logout -> openIntent(applicationContext, "", MainActivity::class.java, radius, pref, languagePref)
             R.id.nav_view_all_birds -> openIntent(applicationContext, "", ViewAllBirds::class.java, radius, pref, languagePref)
+            R.id.navTrophyDisplay -> openIntent(applicationContext, "", TrophyDisplay::class.java, radius, pref, languagePref)
             R.id.nav_logout -> signout()
         }
         return true

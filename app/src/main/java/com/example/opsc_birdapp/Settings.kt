@@ -144,6 +144,7 @@ class Settings : AppCompatActivity(), NavigationView.OnNavigationItemSelectedLis
             R.id.nav_currentlocation -> openIntent(applicationContext, "", UserLocation::class.java,radius,pref,languagePref)
             R.id.nav_settings -> openIntent(applicationContext, "", Settings::class.java,radius,pref,languagePref)
             R.id.nav_view_all_birds -> openIntent(applicationContext, "", ViewAllBirds::class.java, radius, pref, languagePref)
+            R.id.navTrophyDisplay -> openIntent(applicationContext, "", TrophyDisplay::class.java, radius, pref, languagePref)
             R.id.nav_logout -> signout()
         }
         return true;

@@ -3,11 +3,15 @@ package com.example.opsc_birdapp
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.MenuItem
+import android.view.View
+import android.widget.ProgressBar
 import android.widget.TableLayout
 import android.widget.TableRow
 import android.widget.TextView
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.drawerlayout.widget.DrawerLayout
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.opsc_birdapp.databinding.ActivitySettingsBinding
 import com.example.opsc_birdapp.databinding.ActivityViewAllBirdsBinding
 import com.google.android.material.navigation.NavigationView
@@ -17,6 +21,10 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+
 
 class ViewAllBirds : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener  {
 
@@ -27,14 +35,18 @@ class ViewAllBirds : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private var languagePref: String = ""
     private val database = Firebase.database
     private lateinit var auth : FirebaseAuth
+    private lateinit var recyclerView: RecyclerView
+    private lateinit var birdList: MutableList<BirdsData>
+    private lateinit var loadingProgressBar: ProgressBar
 
 
-    private lateinit var listView: TableLayout
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityViewAllBirdsBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        loadingProgressBar = findViewById(R.id.loadingProgressBar)
 
         auth = FirebaseAuth.getInstance()
         val id = auth.currentUser?.uid ?: ""
@@ -66,44 +78,32 @@ class ViewAllBirds : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             languagePref = "Common"
         }
 
-        listView = findViewById(R.id.tableLayoutView)
+        recyclerView = findViewById(R.id.rvBirdListView)
+        recyclerView.layoutManager = LinearLayoutManager(this)
 
         myRef1.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
+                loadingProgressBar.visibility = View.VISIBLE
 
-                // Add rows dynamically
-                for (birdDataSnapshot in snapshot.children) {
-                    val birdData: BirdsData? =
-                        birdDataSnapshot.getValue(BirdsData::class.java)
-                    birdData?.let {
-                        val rowData = arrayOf(
-                            it.location.toString(),
-                            it.name.toString(),
-                            it.species.toString(),
-                            it.user_id.toString()
-                        )
+                GlobalScope.launch(Dispatchers.IO) {
+                    val birdDataList = mutableListOf<BirdsData>()
 
-                        val row = TableRow(this@ViewAllBirds)
-                        val layoutParams = TableLayout.LayoutParams(
-                            TableLayout.LayoutParams.MATCH_PARENT,
-                            TableLayout.LayoutParams.WRAP_CONTENT
-                        )
-                        row.layoutParams = layoutParams
-
-                        for (i in rowData.indices) {
-                            val cell = TextView(this@ViewAllBirds)
-                            cell.text = rowData[i]
-                            cell.setPadding(16, 16, 16, 16)
-                            row.addView(cell)
+                    if (snapshot.exists()) {
+                        for (birdSnapshot in snapshot.children) {
+                            val birdinfo = birdSnapshot.getValue(BirdsData::class.java)
+                            birdinfo?.let { birdDataList.add(it) }
                         }
+                    }
 
-                        listView.addView(row)
+                    launch(Dispatchers.Main) {
+                        loadingProgressBar.visibility = View.GONE
+                        updateUI(birdDataList)
                     }
                 }
             }
 
             override fun onCancelled(error: DatabaseError) {
-                // Handle the error
+                loadingProgressBar.visibility = View.GONE
             }
         })
 
@@ -118,6 +118,11 @@ class ViewAllBirds : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         return super.onOptionsItemSelected(item)
 
     }
+    private fun updateUI(dataList: MutableList<BirdsData>) {
+        birdList = dataList
+        recyclerView.adapter = DisplayAdapter(dataList as ArrayList<BirdsData>)
+    }
+
     private fun signout(){
         auth.signOut()
         openIntent(applicationContext, "", MainActivity::class.java,radius,pref,languagePref)
@@ -131,6 +136,7 @@ class ViewAllBirds : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             R.id.nav_currentlocation -> openIntent(applicationContext, "", UserLocation::class.java,radius,pref,languagePref)
             R.id.nav_settings -> openIntent(applicationContext, "", Settings::class.java,radius,pref,languagePref)
             R.id.nav_view_all_birds -> openIntent(applicationContext, "", ViewAllBirds::class.java, radius, pref, languagePref)
+            R.id.navTrophyDisplay -> openIntent(applicationContext, "", TrophyDisplay::class.java, radius, pref, languagePref)
             R.id.nav_logout -> signout()
 
         }

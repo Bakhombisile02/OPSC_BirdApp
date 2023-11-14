@@ -10,6 +10,7 @@ import android.text.TextUtils
 import android.view.MenuItem
 import android.widget.EditText
 import android.widget.Spinner
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.ActionBarDrawerToggle
@@ -82,7 +83,12 @@ class LogIn : AppCompatActivity() {
             true
         }
 
+        val forgotPasswordTextView: TextView = findViewById(R.id.txtForgotPassword)
 
+        forgotPasswordTextView.setOnClickListener{
+            val intent = Intent(this, ForgotPassword::class.java)
+            startActivity(intent)
+        }
         binding.btnLog.setOnClickListener{
 
             val username = binding.txtUsername.text

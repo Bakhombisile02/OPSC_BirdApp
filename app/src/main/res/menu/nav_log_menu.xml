@@ -21,8 +21,14 @@
         android:icon="@drawable/icon_settings"
         android:title="Settings" />
     <item
+        android:id="@+id/navTrophyDisplay"
+        android:icon="@drawable/baseline_money"
+        android:title="Trophies" />
+    <item
         android:id="@+id/nav_logout"
         android:icon="@drawable/icon_logout"
         android:title="Log Out" />
+
+
 
 </menu>

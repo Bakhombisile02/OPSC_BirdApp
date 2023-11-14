@@ -16,8 +16,21 @@ import com.google.android.gms.location.LocationServices
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseAuth
 import android.Manifest
+import android.content.Intent
+import android.graphics.Bitmap
+import android.provider.MediaStore
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.graphics.drawable.toBitmap
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.StorageReference
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.io.ByteArrayOutputStream
+import java.util.*
 
 class SaveBird : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
@@ -28,15 +41,33 @@ class SaveBird : AppCompatActivity(), NavigationView.OnNavigationItemSelectedLis
     private var languagePref: String = ""
     private lateinit var auth : FirebaseAuth
     private val database = Firebase.database
-
+    private var PhotoExist: Boolean = false
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private val LOCATION_PERMISSION_REQUEST_CODE = 1001
+    private lateinit var storageRef: StorageReference
+    private var fileID: String =""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivitySaveBirdBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        storageRef = FirebaseStorage.getInstance().reference.child("images")
+
+        val getResult = registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult()
+        ) { result ->
+            if (result.resultCode == RESULT_OK) {
+                val intentData: Intent? = result.data
+                if (intentData != null) {
+                    val bitmap = intentData.extras?.get("data") as? Bitmap
+                    if (bitmap != null) {
+                        binding.uploadImage.setImageBitmap(bitmap)
+                        PhotoExist = true
+                    }
+                }
+            }
+        }
         auth = FirebaseAuth.getInstance()
         val id = auth.currentUser?.uid ?: ""
         val myRef = database.getReference("users").child(id).child("Sightings")
@@ -53,18 +84,33 @@ class SaveBird : AppCompatActivity(), NavigationView.OnNavigationItemSelectedLis
         if (intent.getStringExtra("lanpref") == "") {
             languagePref = "Common"
         }
+
+        binding.uploadImage.setOnClickListener {
+            val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+            getResult.launch(intent)
+        }
+
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
         binding.btnSubmit.setOnClickListener {
             val name = binding.txtbirdname.text.toString()
             val species = binding.txtSpecies.text.toString()
+            val bitmap = (binding.uploadImage.drawable).toBitmap()
 
 
-            // Check if both name and species are not empty
-            if (name.isNotEmpty() && species.isNotEmpty()) {
-                // Check for location permission
+                // Inform the user that both name and species are required (you can customize this part)
+            if (binding.txtbirdname.text?.isEmpty()!!) {
+                Toast.makeText(this, "Please enter the name", Toast.LENGTH_SHORT).show();
+            } else if (binding.txtSpecies.text?.isEmpty()!!) {
+                Toast.makeText(this, "Please enter the species", Toast.LENGTH_SHORT).show();
+            } else if (PhotoExist == false) {
+                Toast.makeText(this, "Please add an image", Toast.LENGTH_SHORT).show();
+            }
+            else {
+
                 if (checkLocationPermission()) {
                     // If permission granted, get the user's location
+
                     fusedLocationClient.lastLocation
                         .addOnSuccessListener { location: Location? ->
                             // Got last known location
@@ -74,16 +120,20 @@ class SaveBird : AppCompatActivity(), NavigationView.OnNavigationItemSelectedLis
                                     "name" to name,
                                     "species" to species,
                                     "user_id" to auth.currentUser?.email,
-                                    "location" to "${it.latitude},${it.longitude}"
+                                    "location" to "${it.latitude},${it.longitude}",
+                                    "photoName" to fileID
                                 )
 
                                 // Push the data to the database under a new child node
                                 val newSightingRef = myRef.push()
                                 newSightingRef.setValue(data)
                                     .addOnSuccessListener {
-                                        Toast.makeText(this, "Sighting Added", Toast.LENGTH_SHORT).show()
-                                        binding.txtbirdname.text?.clear()
-                                        binding.txtSpecies.text?.clear()
+                                        GlobalScope.launch(Dispatchers.IO) {
+                                            uploadImageToStorage(bitmap)
+                                        }
+                                        Toast.makeText(this, "Sighting Added", Toast.LENGTH_SHORT)
+                                            .show()
+
                                     }.addOnFailureListener {
                                         Toast.makeText(
                                             this,
@@ -97,11 +147,10 @@ class SaveBird : AppCompatActivity(), NavigationView.OnNavigationItemSelectedLis
                     // Request location permission
                     requestLocationPermission()
                 }
-            } else {
-                // Inform the user that both name and species are required (you can customize this part)
-                Toast.makeText(this, "Please enter both bird name and species", Toast.LENGTH_SHORT)
-                    .show()
             }
+
+
+
 
         }
 
@@ -131,6 +180,7 @@ class SaveBird : AppCompatActivity(), NavigationView.OnNavigationItemSelectedLis
             R.id.nav_currentlocation -> openIntent(applicationContext, "", UserLocation::class.java,radius,pref,languagePref)
             R.id.nav_settings -> openIntent(applicationContext, "", Settings::class.java,radius,pref,languagePref)
             R.id.nav_view_all_birds -> openIntent(applicationContext, "", ViewAllBirds::class.java, radius, pref, languagePref)
+            R.id.navTrophyDisplay -> openIntent(applicationContext, "", TrophyDisplay::class.java, radius, pref, languagePref)
 
         }
 
@@ -149,7 +199,7 @@ private fun checkLocationPermission(): Boolean {
         Manifest.permission.ACCESS_FINE_LOCATION
     ) == PackageManager.PERMISSION_GRANTED)
 }
-
+    //-------------------------------------------------------------------------------------------------------------------------------//
     // Function to request location permission
     private fun requestLocationPermission() {
         ActivityCompat.requestPermissions(
@@ -158,7 +208,7 @@ private fun checkLocationPermission(): Boolean {
             LOCATION_PERMISSION_REQUEST_CODE
         )
     }
-
+    //-------------------------------------------------------------------------------------------------------------------------------//
     // Handle permission request result
     override fun onRequestPermissionsResult(
         requestCode: Int,
@@ -175,5 +225,40 @@ private fun checkLocationPermission(): Boolean {
             }
         }
     }
+//-------------------------------------------------------------------------------------------------------------------------------//
+    private suspend fun uploadImageToStorage(bitmap: Bitmap) {
+        withContext(Dispatchers.IO) {
+            // Convert bitmap to a byte array
+            val baos = ByteArrayOutputStream()
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos)
+            val data = baos.toByteArray()
 
+            // Create a unique file name for the image
+            val fileName = "${UUID.randomUUID()}.jpg"
+
+            fileID = fileName.toString()
+
+            val imageRef = storageRef.child(auth.currentUser?.uid.toString()).child(binding.txtSpecies.text.toString())
+
+            // Upload image to Firebase Storage
+            imageRef.putBytes(data)
+                .addOnSuccessListener {
+                    // Image uploaded successfully
+
+                    Toast.makeText(this@SaveBird, "Image uploaded successfully", Toast.LENGTH_SHORT).show()
+                    binding.uploadImage.setImageResource(R.drawable.baseline_upload)
+                    PhotoExist = false
+                    binding.txtbirdname.text?.clear()
+                    binding.txtSpecies.text?.clear()
+
+                }
+                .addOnFailureListener {
+                    // Handle errors during image upload
+
+                    Toast.makeText(this@SaveBird, "Failed to upload image: ${it.message}", Toast.LENGTH_SHORT).show()
+
+                }
+        }
+    }
+    //-------------------------------------------------------------------------------------------------------------------------------//
 }

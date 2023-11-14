@@ -36,64 +36,30 @@
             app:titleTextColor="@color/apptheme2" />
     </LinearLayout>
 
-    <HorizontalScrollView
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="40dp">
+        android:layout_height="match_parent"
+        android:contentDescription="Scrollable Content"
+        app:layout_constraintTop_toBottomOf="@id/navToolbarView"
+        android:layout_marginTop="60dp">
 
-        <RelativeLayout
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvBirdListView"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="500dp"
+            app:layout_constraintBaseline_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:listitem="@layout/lis_birds" />
 
-            <TableLayout
-                android:id="@+id/tableLayoutView"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@android:color/white"
-                android:layout_marginTop="10dp">
+    </ScrollView>
 
-                <!-- Column titles row -->
-                <TableRow
-                    android:background="@color/apptheme">
-
-                    <TextView
-                        android:layout_width="130dp"
-                        android:layout_height="40dp"
-                        android:textColor="@color/apptheme2"
-                        android:padding="10sp"
-                        android:text="location"
-                        android:textSize="12sp" />
-
-                    <TextView
-                        android:layout_width="100dp"
-                        android:layout_height="40dp"
-                        android:text="Bird Name"
-                        android:textColor="@color/apptheme2"
-                        android:padding="10sp"
-                        android:textSize="12sp" />
-
-                    <TextView
-                        android:layout_width="100dp"
-                        android:layout_height="40dp"
-                        android:text="Bird Species"
-                        android:textColor="@color/apptheme2"
-                        android:padding="10sp"
-                        android:textSize="12sp" />
-
-                    <TextView
-                        android:layout_width="80dp"
-                        android:layout_height="40dp"
-                        android:text="user"
-                        android:textColor="@color/apptheme2"
-                        android:padding="10sp"
-                        android:textSize="12sp" />
-                </TableRow>
-
-                <!-- Rest of the table rows -->
-
-            </TableLayout>
-        </RelativeLayout>
-
-    </HorizontalScrollView>
+    <ProgressBar
+        android:id="@+id/loadingProgressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:visibility="visible" />
 
 </androidx.drawerlayout.widget.DrawerLayout>

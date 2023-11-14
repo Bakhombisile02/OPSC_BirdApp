@@ -1,6 +1,6 @@
-# OPSC_BirdApp
+# AviScope: Discover and Record Bird Observations
 
-AviScope is an Android app that helps bird enthusiasts discover nearby bird watching hotspots and record their bird observations. This project was created to practice the use of APIs.
+AviScope is an Android app designed for bird enthusiasts to explore nearby bird watching hotspots and document their bird observations. This project emphasizes API usage and provides a seamless experience for users interested in birdwatching.
 
 ## Table of Contents
 - [Prerequisites](#prerequisites)
@@ -15,10 +15,11 @@ AviScope is an Android app that helps bird enthusiasts discover nearby bird watc
 - [Support](#support)
 - [Roadmap](#roadmap)
 - [Creators](#creators)
+- [Learning Units](#learning-units)
 
 ## Prerequisites
 
-### Physical device
+### Physical Device
 - Android Oreo 8.1 minimum
 - 4GB of RAM
 - 250MB of storage
@@ -28,12 +29,11 @@ AviScope is an Android app that helps bird enthusiasts discover nearby bird watc
 
 ## Installation
 
-1. Clone this repository to your local machine:
-   git clone https://github.com/your-username/OPSC_BirdApp.git
+Clone this repository to your local machine: git clone https://github.com/your-username/AviScope.git
 
 2. Open the project in Android Studio.
 
-3. Make sure the project location is set up properly.
+3. Ensure the project location is set up properly.
 
 4. Build the project.
 
@@ -55,16 +55,21 @@ AviScope is an Android app that helps bird enthusiasts discover nearby bird watc
 
 7. View and manage your saved bird observations.
 
+8. Check your Trophies and get motivated.
+   
+
 ## Features
 
 - Discover bird watching hotspots near your location.
 - Record bird observations with ease.
 - Customize settings like unit system and travel distance.
 - View detailed information and get directions to hotspots.
+- **Season Recognition:** Automatically recognize the current season to estimate bird activity.
+- **Trophies:** Earn trophies based on the number of bird observations you capture.
 
 ## Demo
 
-Watch the demo video to see the app in action. The video provides a detailed walkthrough of the app's features.
+[Watch the demo video] to see the app in action. The video provides a detailed walkthrough of the app's features.
 
 ## Contributing
 
@@ -72,21 +77,23 @@ We welcome contributions! Please follow [CONTRIBUTING.md](CONTRIBUTING.md) for d
 
 ## License
 
-This project is licensed under the [MIT License](LICENSE).
+This project is licensed under the [MIT License](LICENSE). See the [LICENSE](LICENSE) file for details.
 
 ## Acknowledgements
 
 - This project uses Google services for mapping.
-- Bird data is provided by [eBird API 2.0]([https://birdapi.com/](https://documenter.getpostman.com/view/664302/S1ENwy59)).
+- Bird data is provided by [eBird API 2.0](https://documenter.getpostman.com/view/664302/S1ENwy59).
 
 ## Changelog
 
-- Beta 1 (Not Released Yet)
+### Beta 3 (Not Released Yet)
 - Initial beta release with core features.
+- Added Season Recognition feature.
+- Introduced Trophies based on bird observations.
 
 ## Support
 
-For any questions or concerns, please contact [siyamukeladlamini1@icloud.com].
+For any questions or concerns, please contact [siyamukeladlamini1@icloud.com](mailto:siyamukeladlamini1@icloud.com).
 
 ## Roadmap
 
@@ -96,17 +103,13 @@ For any questions or concerns, please contact [siyamukeladlamini1@icloud.com].
 ## Creators
 
 - Bakhombisile Dlamini
-  - Student Number: st10082221
-  - Institution: IIE Varsity College Cape Town
+- Student Number: st10082221
+- Institution: IIE Varsity College Cape Town
 
 - Alphar Gwenzi
-  - Student Number: st10081886
-  - Institution: IIE Varsity College Cape Town
+- Student Number: st10081886
+- Institution: IIE Varsity College Cape Town
 
 - Dominic Koopman
-  - Student Number: st10081776
-  - Institution: IIE Varsity College Cape Town
-
-
-
-
+- Student Number: st10081776
+- Institution: IIE Varsity College Cape Town
